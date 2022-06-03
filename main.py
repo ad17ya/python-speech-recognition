@@ -26,7 +26,8 @@ print(text)
 
 
 
-# Capturing segments with offset and duration
+###### Capturing segments with offset and duration ######
+
 duration_time = 4
 with harvard as source:
     audio = r.record(source, duration=duration_time)
@@ -72,3 +73,45 @@ text = r.recognize_google(audio)
 print(text)
 
 print("\nThis leads to mismatching because of using bad offset values it might miss parts of some words and match the rest of the word with the other one")
+
+
+###### How does noise affect here? ######
+# Using the jackhammer.wav file here since it has some noise in it.
+
+jackhammer = sr.AudioFile('jackhammer.wav')
+
+with jackhammer as source:
+    audio_noise = r. record(source)
+
+text = r.recognize_google(audio_noise)
+print("\nWhat if the audio file contains some noise")
+print(text)
+
+
+
+# Trying the adjust_for_ambient_noise() method to fix this
+
+with jackhammer as source:
+    r.adjust_for_ambient_noise(source)
+    audio_adjusted = r.record(source)
+
+# text = r.recognize_google(audio_adjusted)
+
+# If the above method doesn't work the below works
+# text=r.recognize_google(audio_adjusted, language='en-IN', show_all=True)
+
+print("\nAfter using the adjust for ambient noise method on the source file")
+print(text)
+
+
+# the time frame that adjust_for_ambient_noise() uses for analysis with the duration keyword
+# it takes numerical value and is set to 1 by default
+
+with jackhammer as source:
+    r.adjust_for_ambient_noise(source, duration=2)
+    audio_adjusted = r.record(source)
+
+# To see the list of all possible transcripts add the show_all argument as well
+text = r.recognize_google(audio_adjusted, show_all=True)
+print("\nUsing duration with adjust_for_ambient_noise")
+print(text)
